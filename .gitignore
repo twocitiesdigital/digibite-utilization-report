@@ -25,3 +25,5 @@ yarn-error.log*
 .vscode/
 *.sublime-project
 *.sublime-workspace
+
+package-lock.json
