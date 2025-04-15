@@ -1,9 +1,7 @@
 import React from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell, 
-  LineChart, Line,
-  ComposedChart, Area
+  PieChart, Pie, Cell
 } from 'recharts';
 
 // Sample data - these would be replaced with real data in production
@@ -128,22 +126,28 @@ const conditionDataByYear = [
   { name: 'Sleep Apnea', Medicare: 63, Commercial: 65, Individual: 58, Medicaid: 60 },
 ];
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#a4de6c', '#d0ed57', '#83a6ed'];
-
 function PopulationDonutChart() {
+  // Calculate total members from population groups
+  const totalMembers = populationGroups.reduce((sum, group) => sum + group.value, 0);
+  
   return (
     <div className="w-full">
-      <h3 className="text-xl font-bold text-center mb-4">Member Population Distribution</h3>
-      <ResponsiveContainer width="100%" height={300}>
+      <h3 className="text-xl font-bold text-center mb-2">Member Population Distribution</h3>
+      <div className="flex flex-col items-center mb-6 bg-blue-50 py-4 px-6 rounded-lg border border-blue-200">
+        <h4 className="text-lg font-semibold text-blue-800 text-center">Total Members</h4>
+        <p className="text-4xl font-bold text-center text-blue-800">{totalMembers.toLocaleString()}</p>
+        <p className="text-sm text-blue-600 mt-1">Across All Plan Types</p>
+      </div>
+      <ResponsiveContainer width="100%" height={320}>
         <PieChart>
           <Pie
             data={populationGroups}
             cx="50%"
             cy="50%"
-            innerRadius={60}
-            outerRadius={100}
+            innerRadius={70}
+            outerRadius={110}
             fill="#8884d8"
-            paddingAngle={2}
+            paddingAngle={3}
             dataKey="value"
             label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
           >
@@ -288,27 +292,33 @@ function SummaryTable({ population, title }) {
 function UtilizationDashboard() {
   const [activeTab, setActiveTab] = React.useState('overview');
   
+  // Format current date as Month DD, YYYY
+  const formatCurrentDate = () => {
+    const date = new Date();
+    return date.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+  
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-6">
       <header className="bg-white shadow-lg rounded-lg p-4 mb-6">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-blue-800">DigiBite 2.0</h1>
-            <p className="text-gray-600">Dental Utilization Insights Report</p>
+            <h1 className="text-3xl font-bold text-blue-800">DigiBite</h1>
+            <p className="text-gray-600">Insights Report</p>
           </div>
           <div className="mt-4 md:mt-0">
-            <p className="font-semibold">Report Date: April 10, 2025</p>
+            <p className="font-semibold">Report Date: {formatCurrentDate()}</p>
             <p className="text-gray-600">Data Period: 2022-2025</p>
           </div>
         </div>
       </header>
       
       <div className="bg-white shadow-lg rounded-lg p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h3 className="text-lg font-semibold text-blue-800">Total Members</h3>
-            <p className="text-3xl font-bold mt-2">12,458</p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-green-50 p-4 rounded-lg border border-green-200">
             <h3 className="text-lg font-semibold text-green-800">Dental Utilization (Last Year)</h3>
             <p className="text-3xl font-bold mt-2">72%</p>
@@ -327,7 +337,7 @@ function UtilizationDashboard() {
       <div className="bg-white shadow-lg rounded-lg p-4 mb-6">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Population Insights Overview</h2>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <PopulationDonutChart />
           <UtilizationBarChart />
         </div>
@@ -387,7 +397,7 @@ function UtilizationDashboard() {
       {activeTab === 'embedded' && <SummaryTable population={medicaidPopulation} title="Medicaid Population - Detailed Utilization" />}
       
       <footer className="mt-8 text-center text-gray-500 text-sm">
-        <p>DigiBite 2.0 Analytics Platform | Data as of April 2025</p>
+        <p>DigiBite 2.0 Analytics Platform | Data as of {formatCurrentDate()}</p>
         <p className="mt-1">This report is for demonstration purposes only.</p>
       </footer>
     </div>
