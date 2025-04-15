@@ -114,16 +114,71 @@ const utilizationData = [
   { name: 'Medicaid', lastYear: 72, lastTwoYears: 85, lastThreeYears: 91 },
 ];
 
-const conditionDataByYear = [
-  { name: 'No Chronic Condition', Medicare: 78, Commercial: 80, Individual: 74, Medicaid: 76 },
-  { name: 'Hypertension', Medicare: 72, Commercial: 70, Individual: 65, Medicaid: 67 },
-  { name: 'Diabetes', Medicare: 68, Commercial: 67, Individual: 62, Medicaid: 64 },
-  { name: 'CVD', Medicare: 65, Commercial: 64, Individual: 59, Medicaid: 61 },
-  { name: 'COPD', Medicare: 62, Commercial: 60, Individual: 55, Medicaid: 57 },
-  { name: 'Hyperlipidemia', Medicare: 74, Commercial: 72, Individual: 67, Medicaid: 69 },
-  { name: 'Atrial Fibrillation', Medicare: 66, Commercial: 66, Individual: 61, Medicaid: 63 },
-  { name: 'CKD', Medicare: 60, Commercial: 58, Individual: 53, Medicaid: 55 },
-  { name: 'Sleep Apnea', Medicare: 63, Commercial: 65, Individual: 58, Medicaid: 60 },
+// Enhanced condition data with additional metrics
+const conditionMatrixData = [
+  { 
+    name: 'No Chronic Condition', 
+    dentistUtilization: { Medicare: 78, Commercial: 80, Individual: 74, Medicaid: 76 },
+    avgCost: { Medicare: 356, Commercial: 412, Individual: 389, Medicaid: 327 },
+    dentalScore: { Medicare: 7.4, Commercial: 7.8, Individual: 7.2, Medicaid: 7.1 },
+    combinedScore: { Medicare: 8.1, Commercial: 8.4, Individual: 7.8, Medicaid: 7.5 }
+  },
+  { 
+    name: 'Hypertension', 
+    dentistUtilization: { Medicare: 72, Commercial: 70, Individual: 65, Medicaid: 67 },
+    avgCost: { Medicare: 389, Commercial: 428, Individual: 402, Medicaid: 342 },
+    dentalScore: { Medicare: 6.8, Commercial: 7.1, Individual: 6.5, Medicaid: 6.4 },
+    combinedScore: { Medicare: 6.5, Commercial: 6.9, Individual: 6.2, Medicaid: 6.1 }
+  },
+  { 
+    name: 'Diabetes', 
+    dentistUtilization: { Medicare: 68, Commercial: 67, Individual: 62, Medicaid: 64 },
+    avgCost: { Medicare: 412, Commercial: 447, Individual: 418, Medicaid: 365 },
+    dentalScore: { Medicare: 6.3, Commercial: 6.7, Individual: 6.0, Medicaid: 5.9 },
+    combinedScore: { Medicare: 5.9, Commercial: 6.3, Individual: 5.7, Medicaid: 5.6 }
+  },
+  { 
+    name: 'Cardiovascular Disease', 
+    dentistUtilization: { Medicare: 65, Commercial: 64, Individual: 59, Medicaid: 61 },
+    avgCost: { Medicare: 436, Commercial: 468, Individual: 431, Medicaid: 378 },
+    dentalScore: { Medicare: 5.9, Commercial: 6.2, Individual: 5.6, Medicaid: 5.5 },
+    combinedScore: { Medicare: 5.4, Commercial: 5.8, Individual: 5.2, Medicaid: 5.1 }
+  },
+  { 
+    name: 'COPD', 
+    dentistUtilization: { Medicare: 62, Commercial: 60, Individual: 55, Medicaid: 57 },
+    avgCost: { Medicare: 448, Commercial: 482, Individual: 445, Medicaid: 392 },
+    dentalScore: { Medicare: 5.5, Commercial: 5.9, Individual: 5.2, Medicaid: 5.1 },
+    combinedScore: { Medicare: 5.0, Commercial: 5.3, Individual: 4.8, Medicaid: 4.7 }
+  },
+  { 
+    name: 'Hyperlipidemia', 
+    dentistUtilization: { Medicare: 74, Commercial: 72, Individual: 67, Medicaid: 69 },
+    avgCost: { Medicare: 375, Commercial: 422, Individual: 398, Medicaid: 345 },
+    dentalScore: { Medicare: 7.0, Commercial: 7.3, Individual: 6.7, Medicaid: 6.6 },
+    combinedScore: { Medicare: 6.8, Commercial: 7.1, Individual: 6.5, Medicaid: 6.4 }
+  },
+  { 
+    name: 'Atrial Fibrillation', 
+    dentistUtilization: { Medicare: 66, Commercial: 66, Individual: 61, Medicaid: 63 },
+    avgCost: { Medicare: 428, Commercial: 458, Individual: 424, Medicaid: 372 },
+    dentalScore: { Medicare: 6.1, Commercial: 6.5, Individual: 5.8, Medicaid: 5.7 },
+    combinedScore: { Medicare: 5.7, Commercial: 6.0, Individual: 5.4, Medicaid: 5.3 }
+  },
+  { 
+    name: 'Chronic Kidney Disease', 
+    dentistUtilization: { Medicare: 60, Commercial: 58, Individual: 53, Medicaid: 55 },
+    avgCost: { Medicare: 465, Commercial: 493, Individual: 452, Medicaid: 398 },
+    dentalScore: { Medicare: 5.2, Commercial: 5.6, Individual: 4.9, Medicaid: 4.8 },
+    combinedScore: { Medicare: 4.7, Commercial: 5.1, Individual: 4.5, Medicaid: 4.4 }
+  },
+  { 
+    name: 'Sleep Apnea', 
+    dentistUtilization: { Medicare: 63, Commercial: 65, Individual: 58, Medicaid: 60 },
+    avgCost: { Medicare: 442, Commercial: 472, Individual: 438, Medicaid: 385 },
+    dentalScore: { Medicare: 5.8, Commercial: 6.1, Individual: 5.5, Medicaid: 5.4 },
+    combinedScore: { Medicare: 5.5, Commercial: 5.9, Individual: 5.3, Medicaid: 5.2 }
+  },
 ];
 
 function PopulationDonutChart() {
@@ -191,32 +246,101 @@ function UtilizationBarChart() {
   );
 }
 
-function ChronicConditionBarChart() {
+function ConditionMatrixTable() {
+  // State to track which plan type is selected
+  const [selectedPlan, setSelectedPlan] = React.useState('Medicare');
+  
+  const planOptions = ['Medicare', 'Commercial', 'Individual', 'Medicaid'];
+  
   return (
     <div className="w-full">
-      <h3 className="text-xl font-bold text-center mb-4">Condition-Specific Utilization - Last Year (%)</h3>
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart
-          data={conditionDataByYear}
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-          layout="vertical"
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis type="number" domain={[0, 100]} />
-          <YAxis dataKey="name" type="category" width={120} />
-          <Tooltip formatter={(value) => [`${value}%`, 'Utilization']} />
-          <Legend />
-          <Bar dataKey="Medicare" fill="#8884d8" />
-          <Bar dataKey="Commercial" fill="#82ca9d" />
-          <Bar dataKey="Individual" fill="#ffc658" />
-          <Bar dataKey="Medicaid" fill="#ff8042" />
-        </BarChart>
-      </ResponsiveContainer>
+      <h3 className="text-xl font-bold text-center mb-4">Condition-Specific Metrics by Plan Type</h3>
+      
+      <div className="flex justify-center mb-6">
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          {planOptions.map(plan => (
+            <button
+              key={plan}
+              type="button"
+              className={`px-6 py-2.5 text-sm font-medium ${selectedPlan === plan 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-white text-gray-700 hover:bg-gray-50 hover:text-blue-700'} 
+                ${plan === 'Medicare' ? 'rounded-l-lg' : ''} 
+                ${plan === 'Medicaid' ? 'rounded-r-lg' : ''}
+                border border-gray-200 focus:z-10 focus:ring-2 focus:ring-blue-300 transition-colors duration-200`}
+              onClick={() => setSelectedPlan(plan)}
+            >
+              {plan}
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      <div className="overflow-x-auto shadow-md rounded-lg">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-blue-50">
+            <tr>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
+                Chronic Condition
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
+                Dentist Utilization (%)
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
+                Avg. Cost of Services ($)
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
+                Dental Score (1-10)
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
+                Dental & Medical Score (1-10)
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {conditionMatrixData.map((condition, index) => (
+              <tr key={index} className={index % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-gray-50 hover:bg-blue-50'}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {condition.name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-semibold">
+                  {condition.dentistUtilization[selectedPlan]}%
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-semibold">
+                  ${condition.avgCost[selectedPlan]}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  <div className="flex items-center">
+                    <span className="mr-2 font-semibold">{condition.dentalScore[selectedPlan].toFixed(1)}</span>
+                    <div className="w-24 bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className={`h-2.5 rounded-full ${condition.dentalScore[selectedPlan] >= 7 ? 'bg-green-500' : condition.dentalScore[selectedPlan] >= 5 ? 'bg-blue-500' : 'bg-yellow-500'}`}
+                        style={{ width: `${condition.dentalScore[selectedPlan] * 10}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  <div className="flex items-center">
+                    <span className="mr-2 font-semibold">{condition.combinedScore[selectedPlan].toFixed(1)}</span>
+                    <div className="w-24 bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className={`h-2.5 rounded-full ${condition.combinedScore[selectedPlan] >= 7 ? 'bg-green-500' : condition.combinedScore[selectedPlan] >= 5 ? 'bg-blue-500' : 'bg-yellow-500'}`}
+                        style={{ width: `${condition.combinedScore[selectedPlan] * 10}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      
+      <div className="mt-4 text-sm text-gray-600 px-4">
+        <p className="mb-1"><span className="font-semibold">Dental Score:</span> Measures overall dental health on a scale of 1-10 based on dental visit frequency, preventive care, and treatment outcomes.</p>
+        <p><span className="font-semibold">Dental & Medical Score:</span> Combines dental health metrics with medical condition management to provide a holistic health assessment on a scale of 1-10.</p>
+      </div>
     </div>
   );
 }
@@ -342,7 +466,7 @@ function UtilizationDashboard() {
           <UtilizationBarChart />
         </div>
         
-        <ChronicConditionBarChart />
+        <ConditionMatrixTable />
       </div>
       
       <nav className="bg-white shadow-lg rounded-lg p-4 mb-6">
