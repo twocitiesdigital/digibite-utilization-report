@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell
+  PieChart, Pie, Cell, LineChart, Line, ReferenceLine
 } from 'recharts';
 
 // Sample data - these would be replaced with real data in production
@@ -124,6 +124,62 @@ const utilizationData = [
   { name: 'Individual', lastYear: 68, lastTwoYears: 82, lastThreeYears: 91 },
   { name: 'Medicaid', lastYear: 72, lastTwoYears: 85, lastThreeYears: 91 },
 ];
+
+// General population metrics data for comparison
+const generalPopulationMetrics = {
+  dentistUtilization: {
+    'No Chronic Condition': {average: 75, low: 68, high: 82},
+    'Hypertension': {average: 65, low: 58, high: 70},
+    'Diabetes': {average: 60, low: 53, high: 66},
+    'Cardiovascular Disease': {average: 56, low: 49, high: 62},
+    'COPD': {average: 53, low: 46, high: 58},
+    'Hyperlipidemia': {average: 68, low: 61, high: 73},
+    'Atrial Fibrillation': {average: 58, low: 51, high: 64},
+    'Chronic Kidney Disease': {average: 50, low: 43, high: 56},
+    'Sleep Apnea': {average: 55, low: 48, high: 61},
+    '2 or more conditions': {average: 54, low: 47, high: 60},
+    '3 or more conditions': {average: 50, low: 43, high: 55}
+  },
+  avgCost: {
+    'No Chronic Condition': {average: 380, low: 320, high: 420},
+    'Hypertension': {average: 410, low: 350, high: 460},
+    'Diabetes': {average: 430, low: 370, high: 480},
+    'Cardiovascular Disease': {average: 450, low: 390, high: 500},
+    'COPD': {average: 460, low: 400, high: 520},
+    'Hyperlipidemia': {average: 400, low: 340, high: 450},
+    'Atrial Fibrillation': {average: 440, low: 380, high: 490},
+    'Chronic Kidney Disease': {average: 470, low: 410, high: 530},
+    'Sleep Apnea': {average: 450, low: 390, high: 510},
+    '2 or more conditions': {average: 480, low: 420, high: 540},
+    '3 or more conditions': {average: 510, low: 450, high: 570}
+  },
+  dentalScore: {
+    'No Chronic Condition': {average: 7.5, low: 6.8, high: 8.1},
+    'Hypertension': {average: 6.7, low: 6.0, high: 7.3},
+    'Diabetes': {average: 6.2, low: 5.5, high: 6.8},
+    'Cardiovascular Disease': {average: 5.8, low: 5.1, high: 6.4},
+    'COPD': {average: 5.4, low: 4.7, high: 6.0},
+    'Hyperlipidemia': {average: 6.9, low: 6.2, high: 7.5},
+    'Atrial Fibrillation': {average: 6.0, low: 5.3, high: 6.6},
+    'Chronic Kidney Disease': {average: 5.1, low: 4.4, high: 5.7},
+    'Sleep Apnea': {average: 5.7, low: 5.0, high: 6.3},
+    '2 or more conditions': {average: 5.3, low: 4.6, high: 5.9},
+    '3 or more conditions': {average: 4.8, low: 4.1, high: 5.4}
+  },
+  combinedScore: {
+    'No Chronic Condition': {average: 8.0, low: 7.3, high: 8.6},
+    'Hypertension': {average: 6.4, low: 5.7, high: 7.0},
+    'Diabetes': {average: 5.8, low: 5.1, high: 6.4},
+    'Cardiovascular Disease': {average: 5.3, low: 4.6, high: 5.9},
+    'COPD': {average: 4.9, low: 4.2, high: 5.5},
+    'Hyperlipidemia': {average: 6.7, low: 6.0, high: 7.3},
+    'Atrial Fibrillation': {average: 5.6, low: 4.9, high: 6.2},
+    'Chronic Kidney Disease': {average: 4.6, low: 3.9, high: 5.2},
+    'Sleep Apnea': {average: 5.4, low: 4.7, high: 6.0},
+    '2 or more conditions': {average: 4.8, low: 4.1, high: 5.4},
+    '3 or more conditions': {average: 4.2, low: 3.5, high: 4.8}
+  }
+};
 
 // Enhanced condition data with additional metrics
 const conditionMatrixData = [
@@ -310,6 +366,72 @@ function UtilizationBarChart() {
   );
 }
 
+// Compact range bar visualization
+function RangeBarChart({ condition, metricType, selectedPlan }) {
+  const generalMetrics = generalPopulationMetrics[metricType][condition];
+  const clientValue = conditionMatrixData.find(c => c.name === condition)[metricType][selectedPlan];
+  
+  // Determine if client value is better than average
+  const isBetter = metricType === 'avgCost' ? 
+    clientValue < generalMetrics.average : 
+    clientValue > generalMetrics.average;
+  
+  // Format value based on metric type
+  const formatValue = (value) => {
+    if (metricType === 'avgCost') return `${value}`;
+    if (metricType.includes('Score')) return value.toFixed(1);
+    return `${value}%`;
+  };
+  
+  // Calculate percentage for positioning client marker
+  const calculatePosition = () => {
+    const range = generalMetrics.high - generalMetrics.low;
+    if (range === 0) return 50;
+    
+    // Limit position within the bar
+    let position = ((clientValue - generalMetrics.low) / range) * 100;
+    position = Math.min(Math.max(position, 0), 100);
+    return position;
+  };
+  
+  return (
+    <div className="flex flex-col">
+      <div className="flex justify-between mb-1">
+        <span className="text-xs text-gray-500">Pop. Avg({formatValue(generalMetrics.average)})</span>
+        <span className={`text-xs font-semibold ${isBetter ? 'text-green-600' : 'text-yellow-600'}`}>
+          {formatValue(clientValue)}
+        </span>
+      </div>
+      <div className="relative w-full h-6 mb-2">
+        {/* Main bar */}
+        <div className="absolute w-full h-6 border border-gray-300 bg-gray-100 rounded-md overflow-hidden">
+          {/* Progress bar for visual effect */}
+          <div 
+            className="h-full bg-blue-50" 
+            style={{ width: `100%` }}
+          ></div>
+        </div>
+        
+        {/* Range markers */}
+        <div className="absolute top-0 left-0 w-full flex justify-between px-2 text-xs">
+          <span className="mt-1 text-gray-500">Low ({formatValue(generalMetrics.low)})</span>
+          <span className="mt-1 text-gray-500">High ({formatValue(generalMetrics.high)})</span>
+        </div>
+        
+        {/* Client value marker */}
+        <div 
+          className={`absolute top-0 w-0.5 h-6 ${isBetter ? 'bg-green-500' : 'bg-yellow-500'}`} 
+          style={{ left: `${calculatePosition()}%` }}
+        ></div>
+        <div 
+          className={`absolute -top-1 w-2 h-2 rounded-full ${isBetter ? 'bg-green-500' : 'bg-yellow-500'}`}
+          style={{ left: `calc(${calculatePosition()}% - 3px)` }}
+        ></div>
+      </div>
+    </div>
+  );
+}
+
 function ConditionMatrixTable() {
   // State to track which plan type is selected
   const [selectedPlan, setSelectedPlan] = React.useState('Medicare');
@@ -367,33 +489,33 @@ function ConditionMatrixTable() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {condition.name}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-semibold">
-                  {condition.dentistUtilization[selectedPlan]}%
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-semibold">
-                  ${condition.avgCost[selectedPlan]}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  <RangeBarChart 
+                    condition={condition.name} 
+                    metricType="dentistUtilization" 
+                    selectedPlan={selectedPlan} 
+                  />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                  <div className="flex items-center">
-                    <span className="mr-2 font-semibold">{condition.dentalScore[selectedPlan].toFixed(1)}</span>
-                    <div className="w-24 bg-gray-200 rounded-full h-2.5">
-                      <div 
-                        className={`h-2.5 rounded-full ${condition.dentalScore[selectedPlan] >= 7 ? 'bg-green-500' : condition.dentalScore[selectedPlan] >= 5 ? 'bg-blue-500' : 'bg-yellow-500'}`}
-                        style={{ width: `${condition.dentalScore[selectedPlan] * 10}%` }}
-                      ></div>
-                    </div>
-                  </div>
+                  <RangeBarChart 
+                    condition={condition.name} 
+                    metricType="avgCost" 
+                    selectedPlan={selectedPlan} 
+                  />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                  <div className="flex items-center">
-                    <span className="mr-2 font-semibold">{condition.combinedScore[selectedPlan].toFixed(1)}</span>
-                    <div className="w-24 bg-gray-200 rounded-full h-2.5">
-                      <div 
-                        className={`h-2.5 rounded-full ${condition.combinedScore[selectedPlan] >= 7 ? 'bg-green-500' : condition.combinedScore[selectedPlan] >= 5 ? 'bg-blue-500' : 'bg-yellow-500'}`}
-                        style={{ width: `${condition.combinedScore[selectedPlan] * 10}%` }}
-                      ></div>
-                    </div>
-                  </div>
+                  <RangeBarChart 
+                    condition={condition.name} 
+                    metricType="dentalScore" 
+                    selectedPlan={selectedPlan} 
+                  />
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                  <RangeBarChart 
+                    condition={condition.name} 
+                    metricType="combinedScore" 
+                    selectedPlan={selectedPlan} 
+                  />
                 </td>
               </tr>
             ))}
@@ -403,7 +525,8 @@ function ConditionMatrixTable() {
       
       <div className="mt-4 text-sm text-gray-600 px-4">
         <p className="mb-1"><span className="font-semibold">Dental Score:</span> Measures overall dental health on a scale of 1-10 based on dental visit frequency, preventive care, and treatment outcomes.</p>
-        <p><span className="font-semibold">Dental & Medical Score:</span> Combines dental health metrics with medical condition management to provide a holistic health assessment on a scale of 1-10.</p>
+        <p className="mb-1"><span className="font-semibold">Dental & Medical Score:</span> Combines dental health metrics with medical condition management to provide a holistic health assessment on a scale of 1-10.</p>
+        <p><span className="font-semibold">Chart Legend:</span> The bars show general population ranges (low to high) with the client population value indicated by the colored marker. Green markers indicate better than average performance.</p>
       </div>
     </div>
   );
