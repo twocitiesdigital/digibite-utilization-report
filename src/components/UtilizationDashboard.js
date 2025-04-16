@@ -5,6 +5,17 @@ import {
 } from 'recharts';
 
 // Sample data - these would be replaced with real data in production
+// Data for CAC and Sleep Apnea donut charts
+const cacData = [
+  { name: 'Has CAC', value: 436, color: '#ff6b6b' },
+  { name: 'No CAC', value: 12022, color: '#74c0fc' }
+];
+
+const sleepApneaData = [
+  { name: 'Has Sleep Apnea', value: 1247, color: '#9775fa' },
+  { name: 'No Sleep Apnea', value: 11211, color: '#63e6be' }
+];
+
 const totalPopulation = {
   totalMembers: 12458,
   utilizingMembers: 9840,
@@ -180,6 +191,46 @@ const conditionMatrixData = [
     combinedScore: { Medicare: 5.5, Commercial: 5.9, Individual: 5.3, Medicaid: 5.2 }
   },
 ];
+
+function HealthRiskDonutChart({ data, title, description }) {
+  // Calculate total members from data
+  const totalMembers = data.reduce((sum, item) => sum + item.value, 0);
+  
+  // Calculate percentage for the first item (the condition we're highlighting)
+  const percentage = ((data[0].value / totalMembers) * 100).toFixed(1);
+  
+  return (
+    <div className="w-full">
+      <h3 className="text-xl font-bold text-center mb-2">{title}</h3>
+      <div className="flex flex-col items-center mb-4 bg-blue-50 py-3 px-4 rounded-lg border border-blue-200">
+        <h4 className="text-lg font-semibold text-blue-800 text-center">Prevalence</h4>
+        <p className="text-4xl font-bold text-center text-blue-800">{percentage}%</p>
+        <p className="text-sm text-blue-600 mt-1">{description}</p>
+      </div>
+      <ResponsiveContainer width="100%" height={200}>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={40}
+            outerRadius={80}
+            fill="#8884d8"
+            paddingAngle={3}
+            dataKey="value"
+            label={({name, percent}) => `${name}: ${(percent * 100).toFixed(1)}%`}
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip formatter={(value) => [`${value} members`, 'Population']} />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 
 function PopulationDonutChart() {
   // Calculate total members from population groups
@@ -498,6 +549,20 @@ function UtilizationDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <PopulationDonutChart />
           <UtilizationBarChart />
+        </div>
+        
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">AI-Detected Health Risk Indicators</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <HealthRiskDonutChart 
+            data={cacData} 
+            title="Carotid Artery Calcification (CAC)" 
+            description="Members with dental x-ray detected calcification" 
+          />
+          <HealthRiskDonutChart 
+            data={sleepApneaData} 
+            title="Sleep Apnea Risk" 
+            description="Members with indicators for sleep apnea" 
+          />
         </div>
         
         <ConditionMatrixTable />
