@@ -375,6 +375,11 @@ function RangeBarChart({ condition, metricType, selectedPlan }) {
   const isBetter = metricType === 'avgCost' ? 
     clientValue < generalMetrics.average : 
     clientValue > generalMetrics.average;
+    
+  // Determine if client value is more than 10% worse than average
+  const isSignificantlyWorse = metricType === 'avgCost' ?
+    clientValue > generalMetrics.average * 1.1 :
+    clientValue < generalMetrics.average * 0.9;
   
   // Format value based on metric type
   const formatValue = (value) => {
@@ -398,7 +403,7 @@ function RangeBarChart({ condition, metricType, selectedPlan }) {
     <div className="flex flex-col">
       <div className="flex justify-between mb-1">
         <span className="text-xs text-gray-500">Pop. Avg({formatValue(generalMetrics.average)})</span>
-        <span className={`text-xs font-semibold ${isBetter ? 'text-green-600' : 'text-yellow-600'}`}>
+        <span className={`text-xs font-semibold ${isSignificantlyWorse ? 'text-red-600' : isBetter ? 'text-green-600' : 'text-yellow-600'}`}>
           {formatValue(clientValue)}
         </span>
       </div>
@@ -420,11 +425,11 @@ function RangeBarChart({ condition, metricType, selectedPlan }) {
         
         {/* Client value marker */}
         <div 
-          className={`absolute top-0 w-0.5 h-6 ${isBetter ? 'bg-green-500' : 'bg-yellow-500'}`} 
+          className={`absolute top-0 w-0.5 h-6 ${isSignificantlyWorse ? 'bg-red-500' : isBetter ? 'bg-green-500' : 'bg-yellow-500'}`} 
           style={{ left: `${calculatePosition()}%` }}
         ></div>
         <div 
-          className={`absolute -top-1 w-2 h-2 rounded-full ${isBetter ? 'bg-green-500' : 'bg-yellow-500'}`}
+          className={`absolute -top-1 w-2 h-2 rounded-full ${isSignificantlyWorse ? 'bg-red-500' : isBetter ? 'bg-green-500' : 'bg-yellow-500'}`}
           style={{ left: `calc(${calculatePosition()}% - 3px)` }}
         ></div>
       </div>
@@ -526,7 +531,7 @@ function ConditionMatrixTable() {
       <div className="mt-4 text-sm text-gray-600 px-4">
         <p className="mb-1"><span className="font-semibold">Dental Score:</span> Measures overall dental health on a scale of 1-10 based on dental visit frequency, preventive care, and treatment outcomes.</p>
         <p className="mb-1"><span className="font-semibold">Dental & Medical Score:</span> Combines dental health metrics with medical condition management to provide a holistic health assessment on a scale of 1-10.</p>
-        <p><span className="font-semibold">Chart Legend:</span> The bars show general population ranges (low to high) with the client population value indicated by the colored marker. Green markers indicate better than average performance.</p>
+        <p><span className="font-semibold">Chart Legend:</span> The bars show general population ranges (low to high) with the client population value indicated by the colored marker. Green markers indicate better than average performance, yellow markers indicate near-average performance, and red markers indicate values more than 10% worse than the population average.</p>
       </div>
     </div>
   );
