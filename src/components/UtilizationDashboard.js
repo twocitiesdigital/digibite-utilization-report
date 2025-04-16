@@ -461,6 +461,40 @@ function UtilizationDashboard() {
       <div className="bg-white shadow-lg rounded-lg p-4 mb-6">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Population Insights Overview</h2>
         
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2">Population Overview</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="font-medium">Total Members:</span>
+                <span>{totalPopulation.totalMembers.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Members Utilizing Dental Services:</span>
+                <span>{totalPopulation.utilizingMembers.toLocaleString()} ({Math.round(totalPopulation.utilizingMembers/totalPopulation.totalMembers*100)}%)</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2">Utilization Timeline</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="font-medium">Last Year:</span>
+                <span>{totalPopulation.lastYear.count.toLocaleString()} ({totalPopulation.lastYear.percentage}%)</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Last 2 Years:</span>
+                <span>{totalPopulation.lastTwoYears.count.toLocaleString()} ({totalPopulation.lastTwoYears.percentage}%)</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-medium">Last 3 Years:</span>
+                <span>{totalPopulation.lastThreeYears.count.toLocaleString()} ({totalPopulation.lastThreeYears.percentage}%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <PopulationDonutChart />
           <UtilizationBarChart />
