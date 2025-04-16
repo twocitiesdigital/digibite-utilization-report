@@ -190,6 +190,20 @@ const conditionMatrixData = [
     dentalScore: { Medicare: 5.8, Commercial: 6.1, Individual: 5.5, Medicaid: 5.4 },
     combinedScore: { Medicare: 5.5, Commercial: 5.9, Individual: 5.3, Medicaid: 5.2 }
   },
+  { 
+    name: '2 or more conditions', 
+    dentistUtilization: { Medicare: 60, Commercial: 62, Individual: 56, Medicaid: 58 },
+    avgCost: { Medicare: 475, Commercial: 498, Individual: 460, Medicaid: 405 },
+    dentalScore: { Medicare: 5.4, Commercial: 5.7, Individual: 5.1, Medicaid: 5.0 },
+    combinedScore: { Medicare: 4.9, Commercial: 5.2, Individual: 4.7, Medicaid: 4.6 }
+  },
+  { 
+    name: '3 or more conditions', 
+    dentistUtilization: { Medicare: 55, Commercial: 57, Individual: 52, Medicaid: 54 },
+    avgCost: { Medicare: 512, Commercial: 535, Individual: 492, Medicaid: 438 },
+    dentalScore: { Medicare: 4.9, Commercial: 5.2, Individual: 4.6, Medicaid: 4.5 },
+    combinedScore: { Medicare: 4.3, Commercial: 4.7, Individual: 4.1, Medicaid: 4.0 }
+  },
 ];
 
 function HealthRiskDonutChart({ data, title, description }) {
