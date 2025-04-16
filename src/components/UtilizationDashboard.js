@@ -225,7 +225,6 @@ function HealthRiskDonutChart({ data, title, description }) {
             ))}
           </Pie>
           <Tooltip formatter={(value) => [`${value} members`, 'Population']} />
-          <Legend />
         </PieChart>
       </ResponsiveContainer>
     </div>
@@ -239,10 +238,10 @@ function PopulationDonutChart() {
   return (
     <div className="w-full">
       <h3 className="text-xl font-bold text-center mb-2">Member Population Distribution</h3>
-      <div className="flex flex-col items-center mb-6 bg-blue-50 py-4 px-6 rounded-lg border border-blue-200">
-        <h4 className="text-lg font-semibold text-blue-800 text-center">Total Members</h4>
-        <p className="text-4xl font-bold text-center text-blue-800">{totalMembers.toLocaleString()}</p>
-        <p className="text-sm text-blue-600 mt-1">Across All Plan Types</p>
+      <div className="flex flex-col items-center mb-6">
+        <h4 className="text-lg font-semibold text-gray-800 text-center">Total Members</h4>
+        <p className="text-4xl font-bold text-center text-gray-800">{totalMembers.toLocaleString()}</p>
+        <p className="text-sm text-gray-600 mt-1">Across All Plan Types</p>
       </div>
       <ResponsiveContainer width="100%" height={320}>
         <PieChart>
@@ -561,7 +560,7 @@ function UtilizationDashboard() {
           <HealthRiskDonutChart 
             data={sleepApneaData} 
             title="Sleep Apnea Risk" 
-            description="Members with indicators for sleep apnea" 
+            description="Members with dental x-ray detected indicators for sleep apnea" 
           />
         </div>
         
